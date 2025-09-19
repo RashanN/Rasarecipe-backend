@@ -3,13 +3,62 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Reaction } from './reaction.entity';
 import { CreateReactionDto, UpdateReactionDto } from './dto/create-reaction.dto';
+import { ReactionDetails } from '../reactions/reaction-details.entity';
 
 @Injectable()
 export class ReactionsService {
   constructor(
     @InjectRepository(Reaction)
     private reactionsRepository: Repository<Reaction>,
+    @InjectRepository(ReactionDetails)
+    private reactionDetailsRepository: Repository<ReactionDetails>,
   ) {}
+
+  // ========== RECIPE REACTIONS METHODS (User Interactions) ==========
+  
+  async getRecipeReactions(recipeId: number) {
+    return await this.reactionDetailsRepository.find({
+      where: { recipeId },
+      relations: ['reaction'],
+    });
+  }
+
+  async addRecipeReaction(recipeId: number, reactionId: number) {
+    const existing = await this.reactionDetailsRepository.findOne({
+      where: { recipeId, reactionId },
+    });
+
+    if (existing) {
+      existing.count += 1;
+      return await this.reactionDetailsRepository.save(existing);
+    } else {
+      const newReactionDetail = this.reactionDetailsRepository.create({
+        recipeId,
+        reactionId,
+        count: 1,
+      });
+      return await this.reactionDetailsRepository.save(newReactionDetail);
+    }
+  }
+
+  async removeRecipeReaction(recipeId: number, reactionId: number) {
+    const existing = await this.reactionDetailsRepository.findOne({
+      where: { recipeId, reactionId },
+    });
+
+    if (existing && existing.count > 0) {
+      existing.count -= 1;
+      if (existing.count === 0) {
+        await this.reactionDetailsRepository.remove(existing);
+        return null;
+      }
+      return await this.reactionDetailsRepository.save(existing);
+    }
+    
+    throw new NotFoundException('Reaction not found');
+  }
+
+  // ========== ADMIN PANEL METHODS (CRUD Operations) ==========
 
   async findAll(): Promise<Reaction[]> {
     return this.reactionsRepository.find({

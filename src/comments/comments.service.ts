@@ -18,7 +18,7 @@ export class CommentsService {
     private readonly userRepo: Repository<User>,
   ) {}
 
-  // Get all comments
+ 
   async findAll(): Promise<Comment[]> {
     return this.commentRepo.find({
       relations: ['author', 'recipe'],
@@ -26,7 +26,7 @@ export class CommentsService {
     });
   }
 
-  // Get one comment
+
   async findOne(id: number): Promise<Comment> {
     const comment = await this.commentRepo.findOne({
       where: { id },
@@ -36,7 +36,7 @@ export class CommentsService {
     return comment;
   }
 
-  // Get comments by recipe slug
+ 
   async findByRecipeSlug(slug: string): Promise<Comment[]> {
     console.log(`Looking for recipe with slug: ${slug}`);
     
@@ -58,7 +58,7 @@ export class CommentsService {
     return comments;
   }
 
-  // Create a new comment
+  
   async create(slug: string, content: string, authorId: number): Promise<Comment> {
     const recipe = await this.recipeRepo.findOne({ where: { slug } });
     if (!recipe) throw new NotFoundException(`Recipe with slug '${slug}' not found`);
@@ -75,20 +75,20 @@ export class CommentsService {
     return this.commentRepo.save(comment);
   }
 
-  // Update comment
+  
   async update(id: number, updateData: Partial<Comment>): Promise<Comment> {
     const comment = await this.findOne(id);
     Object.assign(comment, updateData);
     return this.commentRepo.save(comment);
   }
 
-  // Delete comment
+  
   async remove(id: number): Promise<void> {
     const comment = await this.findOne(id);
     await this.commentRepo.remove(comment);
   }
 
-  // Approve comment
+  
   async approve(id: number): Promise<Comment> {
     const comment = await this.findOne(id);
     comment.isApproved = true;

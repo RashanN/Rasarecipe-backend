@@ -19,6 +19,8 @@ import { ReactionsService } from './reactions.service';
 import { Reaction } from './reaction.entity';
 import { CreateReactionDto, UpdateReactionDto } from './dto/create-reaction.dto';
 import { extname } from 'path';
+import { ReactionDetails } from '../reactions/reaction-details.entity';
+import { Recipe } from '../recipes/recipe.entity';
 
 @Controller('reactions')
 export class ReactionsController {
@@ -122,4 +124,34 @@ export class ReactionsController {
   async remove(@Param('id') id: number): Promise<void> {
     return this.reactionsService.remove(id);
   }
+
+  
+
+
+
+// Add these new endpoints to your ReactionsController class:
+
+@Get('recipe/:recipeId')
+async getRecipeReactions(@Param('recipeId') recipeId: number) {
+  return this.reactionsService.getRecipeReactions(recipeId);
+}
+
+@Post('recipe/:recipeId/react/:reactionId')
+@HttpCode(HttpStatus.OK)
+async addRecipeReaction(
+  @Param('recipeId') recipeId: number,
+  @Param('reactionId') reactionId: number,
+) {
+  return this.reactionsService.addRecipeReaction(recipeId, reactionId);
+}
+
+@Delete('recipe/:recipeId/react/:reactionId')
+@HttpCode(HttpStatus.OK)
+async removeRecipeReaction(
+  @Param('recipeId') recipeId: number,
+  @Param('reactionId') reactionId: number,
+) {
+  return this.reactionsService.removeRecipeReaction(recipeId, reactionId);
+}
+
 }

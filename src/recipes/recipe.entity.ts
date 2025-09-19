@@ -12,6 +12,7 @@ import { User } from '../users/user.entity';
 import { RecipeCategory } from './recipe-category.entity';
 import { RecipeIngredient } from './recipe-ingredient.entity';
 import { Comment } from '../comments/entities/comment.entity';
+import { ReactionDetails } from '../reactions/reaction-details.entity';
 
 @Entity('recipes')
 export class Recipe {
@@ -59,6 +60,10 @@ export class Recipe {
   @OneToMany(() => RecipeCategory, (rc) => rc.recipe, { cascade: true, eager: true })
   recipeCategories: RecipeCategory[];
 
-    @OneToMany(() => Comment, (comment) => comment.recipe)
+  @OneToMany(() => Comment, (comment) => comment.recipe)
   comments: Comment[];
+
+  
+  @OneToMany(() => ReactionDetails, (rd) => rd.recipe, { cascade: true })
+  reactionDetails: ReactionDetails[];
 }
