@@ -237,4 +237,36 @@ export class RecipesService {
     await this.recipeRepo.save(recipe);
     return this.findOne(id);
   }
+
+  async findByCategory(
+  categoryId: number,
+  limit = 10,
+  page = 1,
+  search?: string,
+) {
+  const qb = this.recipeRepo
+    .createQueryBuilder("recipe")
+    .leftJoinAndSelect("recipe.recipeCategories", "rc")
+    .leftJoinAndSelect("rc.category", "category")
+    .leftJoinAndSelect("recipe.author", "author")
+    .where("category.id = :categoryId", { categoryId });
+
+  if (search) {
+    qb.andWhere("recipe.name LIKE :search", { search: `%${search}%` });
+  }
+
+  qb.orderBy("recipe.createdAt", "DESC")
+    .skip((page - 1) * limit)
+    .take(limit);
+
+  const [items, total] = await qb.getManyAndCount();
+
+  return {
+    items,
+    total,
+    totalPages: Math.ceil(total / limit),
+    currentPage: page,
+  };
+}
+
 }

@@ -39,4 +39,5 @@ export class IngredientsController {
   async remove(@Param('id') id: number): Promise<void> {
     return this.ingredientsService.remove(id);
   }
+  
 }

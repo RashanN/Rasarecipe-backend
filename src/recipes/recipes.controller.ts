@@ -137,4 +137,17 @@ export class RecipesController {
     const approvedBy = req.user?.id || 1;
     return this.recipesService.approve(id, approvedBy);
   }
+  
+
+
+  @Get('category/:id')
+async getByCategory(
+  @Param('id') id: number,
+  @Query('limit') limit = 10,
+  @Query('page') page = 1,
+  @Query('search') search?: string,
+) {
+  return this.recipesService.findByCategory(id, limit, page, search);
+}
+
 }
